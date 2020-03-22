@@ -41,7 +41,7 @@ public class Controller {
 		catch(Exception e) {
 			System.out.println("Generic Exception occured inside controller");
 			response.setError("0002");
-			response.setMsg(e.getMessage());
+			response.setMsg("Failure");
 		}
 		System.out.println("End execution of request and returning response");
 		return response;
