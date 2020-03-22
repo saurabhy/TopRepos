@@ -24,10 +24,15 @@ import com.github.toprepos.response.CommiterList;
 import com.github.toprepos.response.CommiterResponse;
 import com.github.toprepos.response.ReposApiResponse;
 import com.github.toprepos.response.ReposResponse;
-
+/*
+ * Implementation for utility methods
+ */
 @Service
 public class UtilityServiceImpl implements UtilityService {
-	
+	/*
+	 * method to find top total repos 
+	 * uses priority queue for same
+	 */
 	@Override
 	public List<ReposResponse> findTopReposInList(ReposApiResponse listResp,Integer total) {
 		System.out.println("filtering list obtained from api response");
@@ -52,14 +57,16 @@ public class UtilityServiceImpl implements UtilityService {
 		System.out.println("filtered list according to top forks");
 		return returnVal;
 	}
-	
+	/*
+	 * Method to find top total committers
+	 * Uses priority queue for same
+	 */
 	@Override
 	public List<Committers> getTopCommitters(CommiterList resp2,int total) {
 		List<Committers> returnVal= new ArrayList<>();
 		Map<String,Integer> m= new HashMap<String,Integer>();
 		List<CommiterResponse> clist=resp2.getResp();
 		for(int i=0;i<clist.size();i++) {
-			//System.out.println(clist.get(i).getCommit().getCommitter().getName());
 			if(m.containsKey(clist.get(i).getCommit().getCommitter().getName())) {
 				m.put(clist.get(i).getCommit().getCommitter().getName(),m.get(clist.get(i).getCommit().getCommitter().getName())+1);
 			}
@@ -94,7 +101,9 @@ public class UtilityServiceImpl implements UtilityService {
 		}
 		return returnVal;
 	}
-	
+	/*
+	 * Method to make rest api calls using rest template
+	 */
 	 public ResponseEntity<String> callApi(String url,PopularRequest req){
    	  System.out.println("Calling api for url : "+url);
    	  RestTemplate restTemplate = new RestTemplate();   	     

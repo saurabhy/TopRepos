@@ -21,26 +21,32 @@ import com.github.toprepos.response.ReposApiResponse;
 import com.github.toprepos.response.ReposResponse;
 import com.github.toprepos.utils.UtilityService;
 import com.github.toprepos.utils.UtilityServiceImpl;
-
+/*
+ * Gateway implementation layer 
+ * Connects to the downstream api using rest template
+ */
 @Service
 public class GatewayImpl implements Gateway{
 	
-	  private static ReposApiResponse resp;
-	  
-	  //private static CommiterList commitlist;
+	  private ReposApiResponse resp;
 	  
 	  @Autowired
 	  private UtilityService utility;
-	
+	  /*
+	   * this is a thread class to call apis for fetching all the repos of the organisation
+	   */
 	  public static class MyThreadRepo implements Runnable{
         
 		private String url;
 		
 		private PopularRequest req;
 		
-		public MyThreadRepo(String url1,PopularRequest request) {
+		private ReposApiResponse resp;
+		
+		public MyThreadRepo(String url1,PopularRequest request,ReposApiResponse respo) {
 			url=url1;
 			req=request;
+			resp=respo;
 		}
 		@Override
 		public void run() {
@@ -49,7 +55,7 @@ public class GatewayImpl implements Gateway{
 	    	ObjectMapper mapper = new ObjectMapper();
 	    	try {
 				List<ReposResponse> r= mapper.readValue(json, new TypeReference<List<ReposResponse>>() {});
-				fillReposResponse(r);
+				fillReposResponse(r,resp);
 			} catch(Exception e) {
 				System.out.println("Exception occured in parsing into java list");
 				e.printStackTrace();
@@ -58,7 +64,9 @@ public class GatewayImpl implements Gateway{
 		}
 		  
 	  }
-	  
+	  /*
+	   * This is a thread class to call apis for fetching commits in a repo
+	   */
 	  public static class MyThreadCommit implements Runnable{
 		  
 		  private String url;
@@ -91,7 +99,7 @@ public class GatewayImpl implements Gateway{
 	  }
 	
       /*
-       * public method exposed to call first api from service layer
+       * public method exposed to call Get repo api from service layer
        */
       public ReposApiResponse callReposApi(String org,PopularRequest req) throws Exception{
     	  System.out.println("Inside gateway layer for 1st api *****************************************************************");
@@ -110,18 +118,16 @@ public class GatewayImpl implements Gateway{
     	    	   ExecutorService executor = Executors.newFixedThreadPool(last);
     	    	   for(Integer i=2;i<=last;i++) {
     	    		   String urlnew=checkMore.get(0)+i.toString();
-    	    		   Runnable worker=new MyThreadRepo(urlnew,req);
+    	    		   Runnable worker=new MyThreadRepo(urlnew,req,resp);
     	    		   executor.execute(worker);
     	    	   }
     	    	   executor.shutdown();
     	   		   executor.awaitTermination(10, TimeUnit.MINUTES);
     	       }    	       
     	  }
-    	  //checkReCallForRepos(result,resp,req);
     	  System.out.println("End gateway layer for 1st api *******************************************************************");
     	  return resp;
       }
-      
       
       public static void fillCommitsResponse(List<CommiterResponse> r,CommiterList commitlist) {
 		synchronized(commitlist) {
@@ -132,7 +138,7 @@ public class GatewayImpl implements Gateway{
 		
 	  }
       
-	  public static void fillReposResponse(List<ReposResponse> r) {
+	  public static void fillReposResponse(List<ReposResponse> r,ReposApiResponse resp) {
 		 synchronized(resp) {
 			 for(int i=0;i<r.size();i++) {
 				 resp.getResponse().add(r.get(i));
@@ -173,6 +179,7 @@ public class GatewayImpl implements Gateway{
       
       /*
        * method to check whether recall is necessary or not
+       * this returns a list containing base url and the last number of the page for an api
        */
       private List<String> checkNext(String header) {
     	  System.out.println("Checking for recall for link : "+ header);

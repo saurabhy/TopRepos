@@ -12,7 +12,10 @@ import com.github.toprepos.exception.CustomException;
 import com.github.toprepos.model.PopularRepos;
 import com.github.toprepos.request.PopularRequest;
 import com.github.toprepos.service.TopRepoService;
-
+/*
+ * 
+ * Controller for routing request 
+ */
 @RestController
 public class Controller {
 	

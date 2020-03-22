@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class PopularRequest {
     private int repoCount;
     private int committerCount;
-	private String authorization;
+	private String authorization; // authorization token is required as github apis have higher number of hits/hr for authenticated user
     
     public String getAuthorization() {
 		return authorization;

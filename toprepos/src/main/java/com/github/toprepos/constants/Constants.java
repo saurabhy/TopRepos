@@ -1,5 +1,7 @@
 package com.github.toprepos.constants;
-
+/*
+ * Constants required for the apis
+ */
 public class Constants {
 	
     public static final String SUCCESS="success";

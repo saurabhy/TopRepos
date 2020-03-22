@@ -24,21 +24,28 @@ import com.github.toprepos.service.TopRepoService;
 import com.github.toprepos.utils.CustomComparator;
 import com.github.toprepos.utils.UtilityService;
 import com.github.toprepos.utils.UtilityServiceImpl;
-
+/*
+ * Service layer Implementation
+ */
 @Service
 public class TopRepoServiceImpl implements TopRepoService{
 	
-	private static PopularRepos resp;
-	
+	private PopularRepos resp;
+	/*
+	 * Thread class to call committers of each repo per thread
+	 */
 	public static class Mythreads implements Runnable{
 		
 		private ReposResponse respCall1;
 		
 		private PopularRequest req;
 		
-		public Mythreads(ReposResponse resp,PopularRequest request) {
-			respCall1=resp;
+		private PopularRepos resp;
+		
+		public Mythreads(ReposResponse resp1,PopularRequest request,PopularRepos respo) {
+			respCall1=resp1;
 			req=request;
+			resp=respo;
 		}
 
 		@Override
@@ -59,7 +66,7 @@ public class TopRepoServiceImpl implements TopRepoService{
 				e.printStackTrace();
 				System.out.println("Exception occured while making second call for repo "+ repo.getRepoName());
 			}
-			fillResponse(repo);
+			fillResponse(repo,resp);
 		}
 		
 	}
@@ -70,6 +77,9 @@ public class TopRepoServiceImpl implements TopRepoService{
 	@Autowired
 	private UtilityService utility;
 	
+	/*
+	 * Public method exposed to controller
+	 */
 	public PopularRepos getAnswer(String org,PopularRequest req) {
 		System.out.println("Inside service ********************************************");
         resp= new PopularRepos();
@@ -78,34 +88,38 @@ public class TopRepoServiceImpl implements TopRepoService{
 		resp.setPopularRepos(returnList);
         List<ReposResponse> call1Resp= getTopRepos(org,req.getRepoCount(),req);
         try {
-			callByThreads(org,req,call1Resp);
+			callByThreads(org,req,call1Resp,resp);   //calling committers of each repo per thread
 		} catch (InterruptedException e) {
 			System.out.println("Interupted exception occured in calling second api");
 			e.printStackTrace();
 		}
-       // getTopCommitters(resp,call1Resp,req.getCommitterCount(),req);
         System.out.println("End service ********************************************");
         Collections.sort(resp.getPopularRepos(), new CustomComparator());
 		return resp;
 	}
-	public static void fillResponse(PopularRepo repo) {
+	public static void fillResponse(PopularRepo repo,PopularRepos resp) {
 		synchronized(resp) {
 			resp.getPopularRepos().add(repo);
 		}
 		
 	}
-	private void callByThreads(String org,PopularRequest req,List<ReposResponse> call1Resp) throws InterruptedException{
+	/*
+	 * Method for calling committers of each repo per thread
+	 */
+	private void callByThreads(String org,PopularRequest req,List<ReposResponse> call1Resp,PopularRepos resp) throws InterruptedException{
 		System.out.println("Started all calls for second api *************************************************************************");
 		ExecutorService executor = Executors.newFixedThreadPool(req.getRepoCount());
 		for(int i=0;i<call1Resp.size();i++) {
-			Runnable worker = new Mythreads(call1Resp.get(i),req);
+			Runnable worker = new Mythreads(call1Resp.get(i),req,resp);
 			executor.execute(worker);
 		}
 		executor.shutdown();
 		executor.awaitTermination(10, TimeUnit.MINUTES);
 		System.out.println("All the apis are called ***********************************************************************************");
 	}
-
+    /*
+     * Method to get all the repos of organsiation from gateway layer
+     */
 	public List<ReposResponse> getTopRepos(String org,Integer total,PopularRequest req) {
 		System.out.println("Calling 1st api from service");
 		List<ReposResponse> topList= null;

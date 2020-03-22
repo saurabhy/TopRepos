@@ -3,7 +3,9 @@ package com.github.toprepos.utils;
 import java.util.Comparator;
 
 import com.github.toprepos.model.PopularRepo;
-
+/*
+ * Comparator used during sorting of repos
+ */
 public class CustomComparator implements Comparator<PopularRepo>{
 
 	@Override
