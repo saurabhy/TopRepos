@@ -28,13 +28,13 @@ import com.github.toprepos.response.ReposResponse;
  * Implementation for utility methods
  */
 @Service
-public class UtilityServiceImpl implements UtilityService {
+public class UtilityServiceImpl  {
 	/*
 	 * method to find top total repos 
 	 * uses priority queue for same
 	 */
-	@Override
-	public List<ReposResponse> findTopReposInList(ReposApiResponse listResp,Integer total) {
+
+	public static List<ReposResponse> findTopReposInList(ReposApiResponse listResp,Integer total) {
 		System.out.println("filtering list obtained from api response");
 		List<ReposResponse> returnVal= new ArrayList<ReposResponse>();
 		PriorityQueue<ReposResponse> q= new PriorityQueue<ReposResponse>();
@@ -61,8 +61,8 @@ public class UtilityServiceImpl implements UtilityService {
 	 * Method to find top total committers
 	 * Uses priority queue for same
 	 */
-	@Override
-	public List<Committers> getTopCommitters(CommiterList resp2,int total) {
+
+	public static List<Committers> getTopCommitters(CommiterList resp2,int total) {
 		List<Committers> returnVal= new ArrayList<>();
 		Map<String,Integer> m= new HashMap<String,Integer>();
 		List<CommiterResponse> clist=resp2.getResp();
@@ -104,7 +104,7 @@ public class UtilityServiceImpl implements UtilityService {
 	/*
 	 * Method to make rest api calls using rest template
 	 */
-	 public ResponseEntity<String> callApi(String url,PopularRequest req){
+	 public static ResponseEntity<String> callApi(String url,PopularRequest req){
    	  System.out.println("Calling api for url : "+url);
    	  RestTemplate restTemplate = new RestTemplate();   	     
    	  HttpHeaders headers = new HttpHeaders();

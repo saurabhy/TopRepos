@@ -22,7 +22,6 @@ import com.github.toprepos.response.ReposApiResponse;
 import com.github.toprepos.response.ReposResponse;
 import com.github.toprepos.service.TopRepoService;
 import com.github.toprepos.utils.CustomComparator;
-import com.github.toprepos.utils.UtilityService;
 import com.github.toprepos.utils.UtilityServiceImpl;
 /*
  * Service layer Implementation
@@ -54,9 +53,9 @@ public class TopRepoServiceImpl implements TopRepoService{
 			repo.setRepoName(respCall1.getFull_name());
 			repo.setForks(respCall1.getForks_count());
 			try{
-				CommiterList resp2= new GatewayImpl().callCommitterApi(repo.getRepoName(),req,new CommiterList());
+				CommiterList resp2= GatewayImpl.callCommitterApi(repo.getRepoName(),req,new CommiterList());
 				System.out.println("For debugging purpose");
-				List<Committers> topCommit= new UtilityServiceImpl().getTopCommitters(resp2, req.getCommitterCount());
+				List<Committers> topCommit= UtilityServiceImpl.getTopCommitters(resp2, req.getCommitterCount());
 				repo.setTopCommiters(topCommit);
 			}
 			catch(CustomException e) {
@@ -73,9 +72,6 @@ public class TopRepoServiceImpl implements TopRepoService{
     
 	@Autowired
 	private Gateway gateway;
-	
-	@Autowired
-	private UtilityService utility;
 	
 	/*
 	 * Public method exposed to controller
@@ -125,7 +121,7 @@ public class TopRepoServiceImpl implements TopRepoService{
 		List<ReposResponse> topList= null;
 		try {
 			ReposApiResponse listResp=gateway.callReposApi(org,req);
-			topList= utility.findTopReposInList(listResp,total);
+			topList= UtilityServiceImpl.findTopReposInList(listResp,total);
 		}
 		catch(CustomException e) {
 			System.out.println("Exception Occured inside service 1st call hence not making next call");

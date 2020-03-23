@@ -6,7 +6,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +18,6 @@ import com.github.toprepos.response.CommiterList;
 import com.github.toprepos.response.CommiterResponse;
 import com.github.toprepos.response.ReposApiResponse;
 import com.github.toprepos.response.ReposResponse;
-import com.github.toprepos.utils.UtilityService;
 import com.github.toprepos.utils.UtilityServiceImpl;
 /*
  * Gateway implementation layer 
@@ -30,8 +28,6 @@ public class GatewayImpl implements Gateway{
 	
 	  private ReposApiResponse resp;
 	  
-	  @Autowired
-	  private UtilityService utility;
 	  /*
 	   * this is a thread class to call apis for fetching all the repos of the organisation
 	   */
@@ -50,7 +46,7 @@ public class GatewayImpl implements Gateway{
 		}
 		@Override
 		public void run() {
-			ResponseEntity<String> response=new UtilityServiceImpl().callApi(url,req);
+			ResponseEntity<String> response=UtilityServiceImpl.callApi(url,req);
 			String json= response.getBody();
 	    	ObjectMapper mapper = new ObjectMapper();
 	    	try {
@@ -83,7 +79,7 @@ public class GatewayImpl implements Gateway{
 		  
 		  @Override
 		  public void run() {
-			    ResponseEntity<String> response=new UtilityServiceImpl().callApi(url,req);
+			    ResponseEntity<String> response=UtilityServiceImpl.callApi(url,req);
 				String json= response.getBody();
 		    	ObjectMapper mapper = new ObjectMapper();
 		    	try {
@@ -105,7 +101,7 @@ public class GatewayImpl implements Gateway{
     	  System.out.println("Inside gateway layer for 1st api *****************************************************************");
           resp= new ReposApiResponse();
     	  String url=Constants.REPO_URL.replace(Constants.REPO_REPLACE, org);
-    	  ResponseEntity<String> result=utility.callApi(url,req);
+    	  ResponseEntity<String> result=UtilityServiceImpl.callApi(url,req);
     	  String json= result.getBody();
     	  ObjectMapper mapper = new ObjectMapper();
     	  List<ReposResponse> r= mapper.readValue(json, new TypeReference<List<ReposResponse>>() {});
@@ -150,10 +146,10 @@ public class GatewayImpl implements Gateway{
       /*
        * Public method exposed to call committer api
        */
-      public CommiterList callCommitterApi(String repoName,PopularRequest req,CommiterList commitlist) throws Exception {
+      public static CommiterList callCommitterApi(String repoName,PopularRequest req,CommiterList commitlist) throws Exception {
     	  System.out.println("Inside gateway layer for 2nd api ");
     	  String url=Constants.COMMIT_URL.replace(Constants.COMMIT_REPLACE, repoName);
-    	  ResponseEntity<String> result=new UtilityServiceImpl().callApi(url,req);
+    	  ResponseEntity<String> result=UtilityServiceImpl.callApi(url,req);
     	  String json= result.getBody();
     	  ObjectMapper mapper = new ObjectMapper();
     	  List<CommiterResponse> r= mapper.readValue(json, new TypeReference<List<CommiterResponse>>() {});
@@ -181,7 +177,7 @@ public class GatewayImpl implements Gateway{
        * method to check whether recall is necessary or not
        * this returns a list containing base url and the last number of the page for an api
        */
-      private List<String> checkNext(String header) {
+      private static List<String> checkNext(String header) {
     	  System.out.println("Checking for recall for link : "+ header);
     	  String[] urls=header.split(",");
     	  String s=null;
