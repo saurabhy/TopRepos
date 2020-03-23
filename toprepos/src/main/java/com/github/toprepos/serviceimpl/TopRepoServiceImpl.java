@@ -114,7 +114,7 @@ public class TopRepoServiceImpl implements TopRepoService{
 			executor.execute(worker);
 		}
 		executor.shutdown();
-		executor.awaitTermination(10, TimeUnit.MINUTES);
+		executor.awaitTermination(2, TimeUnit.MINUTES);
 		System.out.println("All the apis are called ***********************************************************************************");
 	}
     /*

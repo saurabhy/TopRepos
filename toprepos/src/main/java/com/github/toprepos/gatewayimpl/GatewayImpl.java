@@ -122,7 +122,7 @@ public class GatewayImpl implements Gateway{
     	    		   executor.execute(worker);
     	    	   }
     	    	   executor.shutdown();
-    	   		   executor.awaitTermination(10, TimeUnit.MINUTES);
+    	   		   executor.awaitTermination(2, TimeUnit.MINUTES);
     	       }    	       
     	  }
     	  System.out.println("End gateway layer for 1st api *******************************************************************");
@@ -170,7 +170,7 @@ public class GatewayImpl implements Gateway{
 	    		    executor.execute(worker);
 	    	     }
 	    	     executor.shutdown();
-	   		     executor.awaitTermination(10, TimeUnit.MINUTES);
+	   		     executor.awaitTermination(2, TimeUnit.MINUTES);
 	          }    
     	   }
     	  System.out.println("End gateway layer for 2nd api ");
