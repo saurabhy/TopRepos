@@ -200,7 +200,11 @@ Failure: By hitting http://localhost:9090/popularRepos/xyz?repo=5&commit=5
     "popularRepos": null
 }
 
+AWS hosting requirements?
 
+Free cloud only provides 1 instance of t2.micro (1GB RAM, 30 GB memmory and 1 Core). Depending upon the request parameters - a lot of threads are made and hence t2.micro configuration is not suitable for heavier requests where a lot of pages needs to be rendered.
+
+Any further enhancement of infrastructure needs to be paid for on AWS.
 
 
 
